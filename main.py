@@ -93,7 +93,7 @@ def interpretacion_de_comando(comando):
     elif params[0].lower() == 'pause':
         input(">> Pulsa enter para continuar")
     elif params[0].lower() == 'recovery':
-        s = com_recovery(params[1:], particiones_montadas)
+        s = "logout\n"+com_recovery(params[1:], particiones_montadas)
         ejecutar_comandos(s)
     elif params[0].lower() == 'loss':
         com_loss(params[1:], particiones_montadas)
@@ -150,7 +150,7 @@ def com_execute(params):
         print("--Direccion invalida")
         print()
 
-interpretacion_de_comando("execute -path=a_prueba/Entrada1.txt")
+interpretacion_de_comando("execute -path=a_prueba/Entrada2.txt")
 while True:
     comando = input(">>")
 

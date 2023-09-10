@@ -7,6 +7,7 @@ def com_fdisk(params):
     path = None
     name = None
     delete = False
+    add = None
     fit = "W"
     _type = "P"
 
@@ -52,11 +53,21 @@ def com_fdisk(params):
                 name = param[1][1:-1]
             else:
                 name = param[1]
+                
         elif param[0].lower() == "type":
             if param[1][0] == '"':
                 _type = param[1][1:-1]
             else:
                 _type = param[1]
+
+        elif param[0].lower() == "add":
+            try:
+                add = int(param[1])
+            except:
+                print("--Add debe ser un numero entero")
+                print()
+                return
+                
 
     if path == None:
         print("--No se encontro el parametro obligatorio 'path'")
@@ -80,12 +91,11 @@ def com_fdisk(params):
         mbr.deserializar(f.read())
         f.close()
 
+    
     if delete:
-        deleted = False
         for i in range(len(mbr.mbr_partition)):
             x = mbr.mbr_partition[i]
             if x.part_name.decode().strip("\x00") == name:
-                deleted = True
                 mbr.mbr_partition[i] = Partition()
                 contenido = b"\x00"*x.part_s
 
@@ -109,6 +119,179 @@ def com_fdisk(params):
                 print("Particion eliminada exitosamente")
                 print()
                 return
+
+        print("--La particion no existe en el disco")
+        print()
+        return
+
+    if add:
+        add = add*unit
+        if add < 0:
+            for i in range(len(mbr.mbr_partition)):
+                x = mbr.mbr_partition[i]
+                if x.part_name.decode().strip("\x00") == name:
+                    if x.part_s+add <0:
+                        print("--No hay suficiente espacio en la particion")
+                        print()
+                        return
+                    else:
+                        x.part_s = x.part_s+add
+                        mbr.mbr_partition[i] = x
+                        data_serializada = mbr.serializar()
+
+                        with open(path,'r+b') as d:
+                            post = d.read()[len(data_serializada):]
+                            d.seek(0)
+                            d.write(data_serializada)
+                            d.write(post)
+                            d.close()
+                            
+                        print("Cambio en el tamano de la particion realizado con exito")
+                        print()
+                        return
+            
+            extendida = [x for x in mbr.mbr_partition if x.part_type.decode().lower() == "e"]
+            if len(extendida) != 0:
+                extendida = extendida[0]
+                with open(path,"rb") as f:
+                    f.seek(extendida.part_start)
+                    contenido = f.read(extendida.part_s)
+                    f.close()
+                ebr = EBR()
+                porcion = contenido 
+                aceptados = ["1","0"]
+                while True:
+                    ebr.deserializar(porcion)
+                    if ebr.part_name.decode().strip('\x00') == name:
+                        if ebr.part_s+add <0:
+                            print("--No hay suficiente espacio en la particion")
+                            print()
+                            return
+                        else:
+                            ebr.part_s = ebr.part_s+add
+                            data_serializada = ebr.serializar()
+                            pre = contenido[:ebr.part_start-sizeEBR]
+                            post = contenido[ebr.part_start-sizeEBR+len(data_serializada):]
+                            contenido = pre+data_serializada+post
+
+                            with open(path,'r+b') as d:
+                                pre = d.read()[:extendida.part_start]
+                                d.seek(0)
+                                post = d.read()[extendida.part_start+extendida.part_s:]
+                                d.seek(0)
+                                d.write(pre+contenido+post)
+                                d.close()
+
+                            print("Cambio en el tamano de la particion realizado con exito")
+                            print()
+                            return
+                        
+                    if ebr.part_status.decode() not in aceptados or ebr.part_next == -1:
+                        break
+                    porcion = contenido[ebr.part_next:]
+
+                print("--La particion no existe en el disco")
+                print()
+                return
+        else:
+            mbr.mbr_partition.sort(key=lambda x: x.part_start)
+            for i in range(len(mbr.mbr_partition)):
+                x=mbr.mbr_partition[i]
+                if x.part_name.decode().strip("\x00") == name:
+                    disponible = 0
+
+                    if i < 3:
+                        disponible = mbr.mbr_partition[i+1].part_start-(x.part_start+x.part_s)
+                    else:
+                        disponible = mbr.mbr_tamano-(x.part_start+x.part_s)
+
+                    if disponible >= add:
+                        x.part_s = x.part_s+add
+                        mbr.mbr_partition[i] = x
+                        data_serializada = mbr.serializar()
+
+                        with open(path,'r+b') as d:
+                            post = d.read()[len(data_serializada):]
+                            d.seek(0)
+                            d.write(data_serializada)
+                            d.write(post)
+                            d.close()
+                            
+                        print("Cambio en el tamano de la particion realizado con exito")
+                        print()
+                        return
+                    print("--No hay suficiente espacio para expandir la particion")
+                    print()
+                    return
+            
+                            
+            extendida = [x for x in mbr.mbr_partition if x.part_type.decode().lower() == "e"]
+            if len(extendida) != 0:
+                extendida = extendida[0]
+                with open(path,"rb") as f:
+                    f.seek(extendida.part_start)
+                    contenido = f.read(extendida.part_s)
+                    f.close()
+                ebr = EBR()
+                mi_ebr = EBR()
+                porcion = contenido 
+                aceptados = ["1","0"]
+
+                while True:
+                    ebr.deserializar(porcion)
+                    if ebr.part_name.decode().strip('\x00') == name:
+                        mi_ebr.deserializar(porcion)
+                        break
+                    
+                    if ebr.part_status.decode() not in aceptados or ebr.part_next == -1:
+                        break
+                    porcion = contenido[ebr.part_next:]
+
+                if mi_ebr.part_status.decode() not in aceptados:
+                    print("--La particion no existe en el disco")
+                    print()
+                    return
+                
+                porcion = contenido
+                inicio = 0
+                rangos_ocupados = []
+                while True:
+                    ebr.deserializar(porcion)
+                    rangos_ocupados.append((inicio,ebr.part_start+ebr.part_s))
+                    inicio = inicio+sizeEBR+ebr.part_s
+                    if ebr.part_next == -1:
+                        break
+                    porcion = contenido[ebr.part_next:]
+                rangos_ocupados.sort(key=lambda x: x[0])
+
+                for i in range(len(rangos_ocupados)):
+                    size = 0
+                    if i<len(rangos_ocupados)-1:
+                        size = rangos_ocupados[i+1][0]-rangos_ocupados[i][1]       
+                    else:
+                        size = extendida.part_s-rangos_ocupados[i][1]
+
+                    if rangos_ocupados[i][1] == mi_ebr.part_start+mi_ebr.part_s:
+                        if size >= add:
+                            mi_ebr.part_s += add
+                            data_serializada = mi_ebr.serializar()
+                            pre = contenido[:mi_ebr.part_start-sizeEBR]
+                            post = contenido[mi_ebr.part_start-sizeEBR+len(data_serializada):]
+                            contenido = pre+data_serializada+post
+                            with open(path,'r+b') as d:
+                                pre = d.read()[:extendida.part_start]
+                                d.seek(0)
+                                post = d.read()[extendida.part_start+extendida.part_s:]
+                                d.seek(0)
+                                d.write(pre+contenido+post)
+                                d.close()
+                            print("Cambio en el tamano de la particion realizado con exito")
+                            print()
+                            return
+                    
+                        print("--No hay suficiente espacio para expandir la particion")
+                        print()
+                        return        
 
         print("--La particion no existe en el disco")
         print()

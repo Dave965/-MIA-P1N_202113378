@@ -72,7 +72,7 @@ def com_unmount(params, lista_particiones):
     part.setStatus("0")
 
     if ext:
-        data_serializada = part.serializar()
+        data_serializada = part.serializar()+res[0]["datos"]
         pre = cont[:part.part_start-sizeEBR]
         post = cont[part.part_start-sizeEBR+len(data_serializada):]
         cont = pre+data_serializada+post
@@ -84,7 +84,7 @@ def com_unmount(params, lista_particiones):
             d.seek(0)
             d.write(pre+cont+post)
             d.close()
-
+        
         data_serializada = mbr.serializar()
 
         with open(path,'r+b') as d:

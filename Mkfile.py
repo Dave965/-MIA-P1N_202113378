@@ -33,7 +33,12 @@ def com_mkfile(params, lista_particiones, sesion_activa):
                 path = param[1]
 
         if param[0].lower() == "size":
-            size = int(param[1])
+            try:
+                size = int(param[1])
+            except:
+                print("--Size debe ser un numero positivo")
+                print()
+                return
 
         if param[0].lower() == "cont":
             if param[1][0] == '"':
@@ -43,11 +48,6 @@ def com_mkfile(params, lista_particiones, sesion_activa):
                 
     if not path:
         print("--No se encontro el parametro obligatorio 'path'")
-        print()
-        return
-
-    if size <0:
-        print("--Size debe ser un numero positivo")
         print()
         return
 

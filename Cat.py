@@ -51,7 +51,7 @@ def com_cat(params, lista_particiones, sesion_activa):
         
         x, datos = traer_archivo(f,datos)
         s+=x
-        s+="\n\n"
+        s+="\n"
 
     res[0]["datos"] = datos
     print(s)

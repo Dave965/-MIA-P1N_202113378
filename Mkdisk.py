@@ -50,6 +50,7 @@ def com_mkdisk(params):
                 path = param[1][1:-1]
             else:
                 path = param[1]
+            
 
     if tam == None:
         print("--No se encontro el parametro obligatorio 'size'")
@@ -68,10 +69,10 @@ def com_mkdisk(params):
 
     ultimo_disco = path
     
-    if os.path.exists(path):
-        print("--Ya existe un disco creado en '"+path+"'")
-        print()
-        return
+##    if os.path.exists(path):
+##        print("--Ya existe un disco creado en '"+path+"'")
+##        print()
+##        return
 
     directorio = path.rsplit('/',1)[0]
 

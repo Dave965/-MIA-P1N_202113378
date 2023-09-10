@@ -52,6 +52,10 @@ def com_mount(params, lista_particiones):
     extendida = None
     for x in mbr.mbr_partition:
         if x.part_name.decode().strip('\x00') == name:
+            if x.part_type.decode().upper() == "e":
+                print("--No se puede montar una particion extendida")
+                print()
+                return
             part = x
             break
 
@@ -100,6 +104,7 @@ def com_mount(params, lista_particiones):
         post = cont[part.part_start-sizeEBR+len(data_serializada):]
         cont = pre+data_serializada+post
 
+        contenido = cont[part.part_start:part.part_start+part.part_s]
         with open(path,'r+b') as d:
             pre = d.read()[:extendida.part_start]
             d.seek(0)

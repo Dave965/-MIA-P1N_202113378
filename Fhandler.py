@@ -1652,18 +1652,18 @@ def repLs(ruta,particion):
     sb = SuperBlock()
     sb.deserializar(particion)
 
-    res = ""
-
-    existe, ino_number_o, particion = encontrar_archivo(sb,particion,ruta)
-    if not existe:
-        return "--La ruta no existe", particion
-
     res = """digraph G {
   fontname="Helvetica,Arial,sans-serif"
   node [fontname="Helvetica,Arial,sans-serif"]
   edge [fontname="Helvetica,Arial,sans-serif"]\nLs[shape=none label=<
 <TABLE border="0" cellspacing="0" cellpadding="10">
 <TR>\n<TD border="1">Permisos</TD>\n<TD border="1">UID propietario</TD>\n<TD border="1">GID propietario</TD>\n<TD border="1">Fecha de creacion</TD>\n<TD border="1">Tipo</TD>\n<TD border="1">Nombre</TD>\n</TR>\n"""
+
+    existe, ino_number_o, particion = encontrar_archivo(sb,particion,ruta)
+    if not existe:
+        return res+'<TR>\n<TD border="1" colspan="6">No se puede ir a ningun lugar</TD></TR></TABLE>>];\n}', particion
+
+    
 
     posibles_rutas = rutas_posibles(sb,particion,1,ino_number_o)
     if ruta.strip() == "/":
