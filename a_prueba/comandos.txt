@@ -1,0 +1,92 @@
+mkdisk -size=5 -unit=M -path=/home/user/Disco1.dsk
+fdisk -type=P -path=/home/user/Disco1.dsk -unit=M -name=Particion1 -size=1
+fdisk -path=/home/user/Disco1.dsk -type=E -unit=M -name=Particion2 -size=1
+fdisk -path=/home/user/Disco1.dsk -unit=M -type=E -name=Particion3 -size=1
+fdisk -type=P -path=/home/user/Disco1.dsk -unit=M -size=1 -name=Particion4
+mount -path=/home/user/Disco1.dsk -name=Particion1 
+mkfs -id=781Disco1 -fs=3fs
+login -id=781Disco1 -user=root -pass=123
+login -id=781Disco1 -user=root -pass=123
+rmgrp -name=root
+logout
+unmount -id=781Disco1
+mount -path=/home/user/Disco1.dsk -name=Particion1 
+login -id=781Disco1 -user=root -pass=123
+mkgrp -name=usuarios
+mkusr -user=David -pass=1234567 -grp=usuarios
+mkusr -user=David -pass=1234567 -grp=root
+logout
+login -id=781Disco1 -user=David -pass=1234567
+edit -path=/users.txt -cont="a_prueba/lorem ipsum.txt"
+mkfile -path=/carpeta/prueba/hola.txt -cont="a_prueba/lorem ipsum.txt" -r
+mkfile -path=/carpeta/prueba/a1.txt -size=15 -r
+mkfile -path=/carpeta/prueba/a2.txt -size=150 -r
+mkfile -path=/carpeta/prueba/a3.txt -size=3 -r
+mkfile -path=/carpeta/prueba/a4.txt -size=7 
+mkfile -path=/carpeta/otramas/a5.txt -size=7 -r
+move -path=/users.txt -destino=/carpeta
+chown -path=/carpeta -user=root 
+rmgrp -name=root
+logout
+login -id=781Disco1 -user=root -pass=123
+chmod -path=/carpeta -ugo=774 -r
+chgrp -user=David -grp=root
+cat -file1=/users.txt
+cat -file1=/carpeta/prueba/hola.txt -file2=/carpeta/prueba/a2.txt -file3 = "/carpeta/otramas/a5.txt" -file4=/carpeta/prueba/a1.txt
+rep -path=Reportes/particion1_bloque -name=block -id=781Disco1
+rep -path=Reportes/particion1_tree_antes -name=tree -id=781Disco1
+mkdir -r -path=/copia/seguridad
+copy -path=/carpeta/prueba -destino=/copia/seguridad
+edit -path=/carpeta/prueba/hola.txt -cont="a_prueba/a1.txt"
+find -path=/ -name=*.*
+remove -path=/carpeta/prueba
+mkdir -r -path=/home/user/docs/usac
+move -path=/copia/seguridad/a1.txt -destino=/home/user/docs/usac
+mkdir -path="/home/mis documentos/archivos diciembre" -r
+mkfile -path=/home/carnet.txt -size=8 -r
+mkfile -path=/carpeta/prueba/mtt.txt -size=15 -r
+rename -path=/carpeta/prueba -name=c1
+rename -path=/carpeta/c1/mtt.txt -name=import.txt
+chown -path=/carpeta -r -user=root 
+cat -file1=/home/carnet.txt
+rmgrp -name=usuarios
+rmusr -user=David
+rmgrp -name=usuarios
+rmusr -user=root
+copy -path=/copia/seguridad/hola.txt -destino=/carpeta/c1
+find -path=/ -name=*.*
+find -path=/ -name=a*.*
+find -path=/ -name=*
+logout
+login -id=781Disco1 -user=David -pass=1234567
+logout
+rep -path=Reportes/particion1_tree_despues -name=tree -id=781Disco1
+rep -path=Reportes/particion1_bm_inodo.txt -name=bm_inode -id=781Disco1
+rep -path=Reportes/particion1_bm_block.txt -name=bm_block -id=781Disco1
+rep -path=Reportes/particion1_inodo -name=inode -id=781Disco1
+rep -path=Reportes/particion1_bloque -name=block -id=781Disco1
+rep -path=Reportes/particion1_sb -name=sb -id=781Disco1
+rep -path=Reportes/particion1_fileCarnet.txt -ruta=/home/carnet.txt -name=file -id=781Disco1
+rep -path=Reportes/particion1_fileA1.txt -ruta=/home/user/docs/usac/a1.txt -name=file -id=781Disco1
+rep -path=Reportes/particion1_Ls -ruta=/ -name=ls -id=781Disco1
+rep -path=Reportes/particion1_Journaling -name=journaling -id=781Disco1
+pause
+loss -id=781Disco1
+move -path=/copia/seguridad/a1.txt -destino=/home/user/docs/usac
+mkdir -path="/home/mis documentos/archivos diciembre" -r
+mkfile -path=/home/carnet.txt -size=8 -r
+mkfile -path=/carpeta/prueba/mtt.txt -size=15 -r
+rename -path=/carpeta/prueba -name=c1
+pause
+recovery -id=781Disco1
+rep -path=Reportes/particion1_tree_recovery -name=tree -id=781Disco1
+rep -path=Reportes/particion1_bm_inodo_recovery.txt -name=bm_inode -id=781Disco1
+rep -path=Reportes/particion1_bm_block_recovery.txt -name=bm_block -id=781Disco1
+rep -path=Reportes/particion1_inodo_recovery -name=inode -id=781Disco1
+rep -path=Reportes/particion1_bloque_recovery -name=block -id=781Disco1
+rep -path=Reportes/particion1_sb_recovery -name=sb -id=781Disco1
+rep -path=Reportes/particion1_fileCarnet_recovery.txt -ruta=/home/carnet.txt -name=file -id=781Disco1
+rep -path=Reportes/particion1_fileA1_recovery.txt -ruta=/home/user/docs/usac/a1.txt -name=file -id=781Disco1
+rep -path=Reportes/particion1_Ls_recovery -ruta=/ -name=ls -id=781Disco1
+rep -path=Reportes/particion1_Journaling_recovery -name=journaling -id=781Disco1
+unmount -id=781Disco1
