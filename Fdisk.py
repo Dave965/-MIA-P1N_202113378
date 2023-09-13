@@ -10,10 +10,14 @@ def com_fdisk(params):
     add = None
     fit = "W"
     _type = "P"
+    skip = False
 
     for x in params:
         param = [w.strip() for w in x.split("=")]
-
+        if skip:
+            skip = False
+            continue
+        
         if param[0].lower() == "delete":
             delete = True
         
@@ -64,9 +68,15 @@ def com_fdisk(params):
             try:
                 add = int(param[1])
             except:
-                print("--Add debe ser un numero entero")
-                print()
-                return
+                try:
+                    sig = params.index(x)+1
+                    par = [w.strip() for w in params[sig].split("=")]
+                    add = -int(par[0])
+                    skip = True
+                except:
+                    print("--Add debe ser un numero entero")
+                    print()
+                    return
                 
 
     if path == None:

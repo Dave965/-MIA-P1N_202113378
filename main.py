@@ -150,7 +150,6 @@ def com_execute(params):
         print("--Direccion invalida")
         print()
 
-interpretacion_de_comando("execute -path=a_prueba/Entrada2.txt")
 while True:
     comando = input(">>")
 
